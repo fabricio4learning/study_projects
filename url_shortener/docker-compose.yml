@@ -6,7 +6,7 @@ services:
       - '9042:9042'
     volumes:
       - cassandra_data:/var/lib/cassandra
-      - ./docker/cassandra/init.cql:/docker-entrypoint-initdb.d/init.cql
+      - ./docker/cassandra:/docker-entrypoint-initdb.d
     environment:
       - CASSANDRA_CLUSTER_NAME=url-shortener-cluster
       - CASSANDRA_DC=datacenter1
