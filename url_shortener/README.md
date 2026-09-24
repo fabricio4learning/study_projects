@@ -1,124 +1,262 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Encurtador de URLs
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Projeto de encurtamento de URLs construído com NestJS, Fastify, Cassandra e Redis.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Este documento descreve como preparar e iniciar o ambiente local referente às **US-01 — Setup do projeto NestJS com adapter Fastify** e **US-02 — Ambiente Docker Compose com Cassandra e Redis**.
 
-## Description
+## Pré-requisitos
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Instale previamente:
 
-## Project setup
+- Node.js compatível com a versão definida no projeto.
+- npm.
+- Docker Engine ou Docker Desktop.
+- Docker Compose v2, disponibilizado pelo comando `docker compose`.
+
+Valide as instalações:
 
 ```bash
-$ pnpm install
+node --version
+npm --version
+docker --version
+docker compose version
 ```
 
-## Compile and run the project
+## Estrutura esperada
+
+Os arquivos relacionados ao ambiente local devem estar organizados aproximadamente assim:
+
+```text
+.
+├── docker-compose.yml
+├── docker/
+│   └── cassandra/
+│       └── init.cql
+├── package.json
+├── src/
+├── test/
+└── README.md
+```
+
+O `init.cql` deve conter somente o bootstrap de infraestrutura do Cassandra, como a criação do keyspace. A criação e a evolução das tabelas pertencem ao schema versionado da US-03.
+
+## US-01 — Aplicação NestJS
+
+A US-01 estabelece a base da aplicação com NestJS e `FastifyAdapter`. Ela inclui o bootstrap da aplicação, o endpoint `GET /health`, a estrutura inicial de módulos, ESLint, Prettier e o teste E2E básico do health check.
+
+### Instalar dependências
+
+Na raiz do projeto, execute:
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+npm install
 ```
 
-## Run tests
+### Iniciar em desenvolvimento
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+npm run start:dev
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Por padrão, a aplicação deve iniciar na porta configurada pelo projeto. Caso exista suporte à variável `PORT`, ela pode ser informada assim:
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+PORT=3000 npm run start:dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Observability
-
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-To add it to this project:
+Em outro terminal, valide o health check:
 
 ```bash
-$ pnpm install @nestjs/observe
+curl -i http://localhost:3000/health
 ```
 
-Then follow the [setup guide](https://docs.nestjs.com/observability/overview) - it takes a single import and an app key.
+O resultado esperado é HTTP `200` com o payload definido pela implementação do projeto.
 
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
+### Executar validações
 
-## Resources
+```bash
+npm run lint
+npm run format
+npm run test:e2e
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+Se o script `format` não existir no `package.json`, use o comando equivalente configurado no projeto, por exemplo:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+npx prettier --write .
+```
 
-## Support
+## US-02 — Cassandra e Redis
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+A US-02 disponibiliza Cassandra e Redis localmente via Docker Compose, com portas expostas, volumes persistentes, keyspace inicializado no Cassandra e persistência habilitada no Redis para preservar o contador usado por `INCR` após reinicializações. Esses requisitos estão registrados na história FAB-10 do Linear. [cite:linear_native:2]
 
-## Stay in touch
+### Subir os serviços
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Na raiz do projeto, execute:
 
-## License
+```bash
+docker compose up -d
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+#### Primeiro Setup
+
+Após `docker-compose up -d`, executar uma vez:
+
+```bash
+docker-compose exec cassandra cqlsh -e "CREATE KEYSPACE IF NOT EXISTS url_shortener WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};"
+```
+
+Para acompanhar os logs:
+
+```bash
+docker compose logs -f
+```
+
+Verifique o estado dos containers:
+
+```bash
+docker compose ps
+```
+
+Aguarde os serviços ficarem prontos antes de iniciar testes que dependam deles. O primeiro boot do Cassandra pode levar alguns minutos.
+
+### Validar Cassandra
+
+Confirme que o container está em execução:
+
+```bash
+docker compose ps cassandra
+```
+
+Abra o cliente CQL dentro do container:
+
+```bash
+docker compose exec cassandra cqlsh
+```
+
+No prompt do Cassandra, valide o keyspace:
+
+```sql
+DESCRIBE KEYSPACES;
+```
+
+Saia com:
+
+```sql
+EXIT;
+```
+
+O schema das tabelas não deve ser criado pelo bootstrap da US-02. Ele deverá ser aplicado pelo mecanismo de schema versionado definido na US-03.
+
+### Validar Redis
+
+Verifique a conectividade:
+
+```bash
+docker compose exec redis redis-cli PING
+```
+
+A resposta esperada é:
+
+```text
+PONG
+```
+
+Valide a persistência do contador com uma chave de teste:
+
+```bash
+docker compose exec redis redis-cli INCR url_counter
+```
+
+Reinicie somente o Redis:
+
+```bash
+docker compose restart redis
+```
+
+Leia o valor novamente:
+
+```bash
+docker compose exec redis redis-cli GET url_counter
+```
+
+O valor deve continuar disponível após o restart, porque o serviço está configurado com persistência. Se a chave já tiver sido utilizada anteriormente, o número retornado será maior que `1`.
+
+## Fluxo completo de inicialização
+
+Para iniciar o ambiente local do zero, use:
+
+```bash
+npm install
+docker compose up -d
+docker compose ps
+npm run start:dev
+```
+
+Em outro terminal:
+
+```bash
+curl -i http://localhost:3000/health
+docker compose exec cassandra cqlsh -e "DESCRIBE KEYSPACES;"
+docker compose exec redis redis-cli PING
+```
+
+A aplicação NestJS deve responder ao health check e os dois serviços devem estar acessíveis pelos hostnames e portas definidos no `docker-compose.yml`.
+
+## Parar o ambiente
+
+Para parar os containers sem remover os dados persistidos:
+
+```bash
+docker compose down
+```
+
+Para parar e remover também os volumes, recriando o ambiente na próxima subida:
+
+```bash
+docker compose down -v
+```
+
+> Atenção: `docker compose down -v` remove os dados persistidos do Cassandra e do Redis. Use esse comando somente quando quiser resetar o ambiente local.
+
+## Solução de problemas
+
+### Porta já está em uso
+
+Identifique o processo que ocupa a porta ou altere o mapeamento no `docker-compose.yml`. As portas normalmente utilizadas são:
+
+- Aplicação NestJS: `3000`.
+- Cassandra: `9042`.
+- Redis: `6379`.
+
+### Cassandra ainda não responde
+
+Aguarde a conclusão da inicialização e consulte os logs:
+
+```bash
+docker compose logs -f cassandra
+```
+
+### Redis não responde
+
+Consulte os logs e confirme o status do container:
+
+```bash
+docker compose logs redis
+docker compose ps redis
+```
+
+### Reset completo
+
+Se o ambiente estiver inconsistente, remova containers e volumes e suba novamente:
+
+```bash
+docker compose down -v
+docker compose up -d
+```
+
+## Escopo das histórias
+
+- **US-01:** base NestJS com Fastify, health check, qualidade de código e teste E2E.
+- **US-02:** ambiente local com Cassandra e Redis via Docker Compose, bootstrap do keyspace e persistência dos dados.
+- **US-03:** schema versionado das tabelas do Cassandra, fora do bootstrap da US-02.
