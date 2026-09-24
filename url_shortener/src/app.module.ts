@@ -6,6 +6,7 @@ import { validate } from './config/env.schema';
 import { CassandraModule } from './cassandra/cassandra.module';
 import { RedisModule } from './redis/redis.module';
 import { HealthModule } from './health/health.module';
+import { UrlMappingModule } from './url-mapping/url-mapping.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { HealthModule } from './health/health.module';
     CassandraModule,
     RedisModule,
     HealthModule,
+    UrlMappingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
