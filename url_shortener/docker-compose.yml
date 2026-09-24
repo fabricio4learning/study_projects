@@ -1,0 +1,48 @@
+services:
+  cassandra:
+    image: cassandra:5.0
+    container_name: url-shortener-cassandra
+    ports:
+      - '9042:9042'
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+      - ./docker/cassandra/init.cql:/docker-entrypoint-initdb.d/init.cql
+    environment:
+      - CASSANDRA_CLUSTER_NAME=url-shortener-cluster
+      - CASSANDRA_DC=datacenter1
+      - CASSANDRA_RACK=rack1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+    healthcheck:
+      test: ['CMD-SHELL', "cqlsh -e 'DESCRIBE KEYSPACES'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - url-shortener-network
+
+  redis:
+    image: redis:7.2
+    container_name: url-shortener-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --appendfsync everysec
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - url-shortener-network
+
+volumes:
+  cassandra_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  url-shortener-network:
+    driver: bridge
